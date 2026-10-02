@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>نصب فروشگاه</title>
+<style>
+body{font-family:Tahoma,sans-serif;padding:16px;max-width:480px;margin:auto}
+input,button{width:100%;padding:12px;margin:6px 0;font:inherit;box-sizing:border-box}
+button{background:#0f4c5c;color:#fff;border:0;border-radius:8px}
+#log{white-space:pre-wrap;font-size:13px;margin-top:12px;line-height:1.9}
+</style>
+</head>
+<body>
+<h2>🛒 نصب فروشگاه — فاز ۱</h2>
+<input id="name" placeholder="اسم فروشگاه">
+<input id="wa" placeholder="شماره واتساپ (مثلاً ۰۹۱۲۳۴۵۶۷۸۹)" inputmode="tel">
+<label>رنگ اصلی</label><input id="color" type="color" value="#0f4c5c">
+<input id="user" placeholder="نام کاربری گیت‌هاب" autocapitalize="none">
+<input id="repo" placeholder="نام ریپو (از قبل ساخته شده)" autocapitalize="none">
+<input id="token" type="password" placeholder="توکن گیت‌هاب (دسترسی Contents: write)">
+<button id="go">آپلود خودکار</button>
+<div id="log"></div>
+<script>
+const VERSION = 1;
+const FILES = {"index.html": "<!doctype html>\n<html lang=\"fa\" dir=\"rtl\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<meta name=\"theme-color\" content=\"#0f4c5c\">\n<link rel=\"manifest\" href=\"./manifest.json\">\n<link rel=\"icon\" href=\"./icons/icon-192.png\">\n<link rel=\"stylesheet\" href=\"./style.css\">\n<title>فروشگاه<\/title>\n<\/head>\n<body>\n<header><h1 id=\"shopName\"><\/h1><p id=\"slogan\"><\/p><\/header>\n<nav id=\"chips\"><\/nav>\n<main id=\"grid\"><\/main>\n<script src=\"./products.js\"><\/script>\n<script src=\"./app.js\"><\/script>\n<\/body>\n<\/html>\n", "style.css": "@font-face{font-family:Vazirmatn;src:url(\"./fonts/Vazirmatn.woff2\") format(\"woff2\");font-weight:100 900;font-display:swap}\n:root{--c:#0f4c5c}\n*{box-sizing:border-box;margin:0}\nbody{font-family:Vazirmatn,Tahoma,sans-serif;background:#f4f6f7;color:#1d2529}\nheader{background:var(--c);color:#fff;padding:28px 16px 22px;text-align:right}\nheader h1{font-size:24px;font-weight:800}\nheader p{opacity:.85;font-size:14px;margin-top:6px}\n#chips{display:flex;gap:8px;overflow-x:auto;padding:14px 12px}\n.chip{border:1.5px solid var(--c);background:#fff;color:var(--c);padding:6px 16px;border-radius:20px;font:inherit;font-size:14px;white-space:nowrap}\n.chip.on{background:var(--c);color:#fff}\n#grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 12px 28px}\n.card{background:#fff;border-radius:10px;overflow:hidden;border:1px solid #e1e6e8}\n.img{aspect-ratio:1;background:#e3e9eb;display:grid;place-items:center;font-size:36px}\n.img img{width:100%;height:100%;object-fit:cover}\n.b{padding:10px 12px 12px}\n.b h3{font-size:14px;font-weight:600}\n.p{color:var(--c);font-weight:800;font-size:14px;margin-top:6px}\n", "app.js": "const fa = n => Number(n).toLocaleString(\"fa-IR\");\nconst $ = id => document.getElementById(id);\ndocument.documentElement.style.setProperty(\"--c\", SHOP.color);\ndocument.querySelector(\"meta[name=theme-color]\").content = SHOP.color;\ndocument.title = SHOP.name;\n$(\"shopName\").textContent = SHOP.name;\n$(\"slogan\").textContent = SHOP.slogan;\nlet cat = \"همه\";\nfunction render() {\n  $(\"chips\").innerHTML = [\"همه\", ...CATEGORIES].map(c =>\n    `<button class=\"chip ${c === cat ? \"on\" : \"\"}\" data-c=\"${c}\">${c}<\/button>`).join(\"\");\n  $(\"grid\").innerHTML = PRODUCTS.filter(p => cat === \"همه\" || p.category === cat).map(p =>\n    `<div class=\"card\"><div class=\"img\">${p.image ? `<img src=\"${p.image}\" alt=\"\">` : \"🛍️\"}<\/div>` +\n    `<div class=\"b\"><h3>${p.name}<\/h3><div class=\"p\">${fa(p.price)} تومان<\/div><\/div><\/div>`).join(\"\");\n}\n$(\"chips\").onclick = e => { if (e.target.dataset.c) { cat = e.target.dataset.c; render(); } };\nrender();\nif (\"serviceWorker\" in navigator) navigator.serviceWorker.register(\"./sw.js\");\n", "products.js": "const SHOP = { name: \"__NAME__\", slogan: \"بهترین‌ها را از ما بخواهید\", color: \"__COLOR__\", whatsapp: \"__WA__\" };\nconst CATEGORIES = [\"پوشاک\", \"کیف و کفش\", \"اکسسوری\"];\nconst PRODUCTS = [\n  { id: 1, name: \"پیراهن نمونه\", price: 450000, category: \"پوشاک\", image: \"\" },\n  { id: 2, name: \"کیف دستی نمونه\", price: 890000, category: \"کیف و کفش\", image: \"\" },\n  { id: 3, name: \"کفش نمونه\", price: 1250000, category: \"کیف و کفش\", image: \"\" },\n  { id: 4, name: \"ساعت نمونه\", price: 320000, category: \"اکسسوری\", image: \"\" }\n];\n", "manifest.json": "{\n  \"name\": \"__NAME__\",\n  \"short_name\": \"__NAME__\",\n  \"start_url\": \"./\",\n  \"scope\": \"./\",\n  \"display\": \"standalone\",\n  \"dir\": \"rtl\",\n  \"lang\": \"fa\",\n  \"background_color\": \"#ffffff\",\n  \"theme_color\": \"__COLOR__\",\n  \"icons\": [\n    { \"src\": \"./icons/icon-192
+.png\", \"sizes\": \"192x192\", \"type\": \"image/png\", \"purpose\": \"any maskable\" },\n    { \"src\": \"./icons/icon-512.png\", \"sizes\": \"512x512\", \"type\": \"image/png\", \"purpose\": \"any maskable\" }\n  ]\n}\n", "version.json": "{ \"version\": 1 }\n", "sw.js": "const V = \"v1\", CACHE = \"shop-\" + V;\nconst ASSETS = [\"./\", \"./index.html\", \"./style.css\", \"./app.js\", \"./products.js\", \"./manifest.json\",\n  \"./fonts/Vazirmatn.woff2\", \"./icons/icon-192.png\", \"./icons/icon-512.png\"];\nconst LIVE = [\"products.js\", \"version.json\"];\nself.addEventListener(\"install\", e => {\n  e.waitUntil(caches.open(CACHE).then(c => Promise.allSettled(ASSETS.map(a => c.add(a)))).then(() => self.skipWaiting()));\n});\nself.addEventListener(\"activate\", e => {\n  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));\n});\nself.addEventListener(\"fetch\", e => {\n  const r = e.request, u = new URL(r.url);\n  if (r.method !== \"GET\" || u.origin !== location.origin) return;\n  const put = res => { const c = res.clone(); caches.open(CACHE).then(x => x.put(r, c)); return res; };\n  if (LIVE.some(f => u.pathname.endsWith(f))) {\n    e.respondWith(fetch(r, { cache: \"no-store\" }).then(put).catch(() => caches.match(r)));\n  } else {\n    e.respondWith(caches.match(r).then(m => m || fetch(r).then(put)));\n  }\n});\n"};
+const FONTS = [
+  "https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn%5Bwght%5D.woff2",
+  "https://cdn.jsdelivr.net/npm/@alwatr/font@0.21.0/vazirmatn/vazirmatn%5Bwght%5D.woff2"
+];
+const $ = id => document.getElementById(id);
+const KEYS = ["name", "wa", "color", "user", "repo", "token"];
+KEYS.forEach(k => { const v = localStorage.getItem("setup_" + k); if (v) $(k).value = v; });
+const log = t => { $("log").textContent += t + "\n"; };
+const b64text = s => { let b = ""; new TextEncoder().encode(s).forEach(x => b += String.fromCharCode(x)); return btoa(b); };
+const b64buf = ab => { let b = "", u = new Uint8Array(ab); for (let i = 0; i < u.length; i += 8192) b += String.fromCharCode.apply(null, u.subarray(i, i + 8192)); return btoa(b); };
+function icon(size, color, ch) {
+  const c = document.createElement("canvas"); c.width = c.height = size;
+  const x = c.getContext("2d");
+  x.fillStyle = color; x.fillRect(0, 0, size, size);
+  x.fillStyle = "#fff"; x.font = "bold " + size * 0.5 + "px Tahoma";
+  x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(ch, size / 2, size / 2);
+  return c.toDataURL("image/png").split(",")[1];
+}
+$("go").onclick = async () => {
+  KEYS.forEach(k => localStorage.setItem("setup_" + k, $(k).value));
+  const name = $("name").value.replace(/["\\<>]/g, "").trim() || "فروشگاه من";
+  const wa = $("wa").value.trim(), color = $("color").value;
+  const user = $("user").value.trim(), repo = $("repo").value.trim(), token = $("token").value.trim();
+  if (!user || !repo || !token) { log("❌ نام کاربری، ریپو و توکن را پر کن."); return; }
+  $("log").textContent = "";
+  const api = `https://api.github.com/repos/${user}/${repo}`;
+  const h = { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" };
+  try {
+    const info = await fetch(api, { headers: h });
+    if (!info.ok) throw new Error("ریپو یا توکن درست نیست (" + info.status + ")");
+    const branch = (await info.json()).default_branch;
+    const put = async (path, content) => {
+      const url = api + "/contents/" + path;
+      const g = await fetch(url + "?ref=" + branch, { headers: h, cache: "no-store" });
+      const sha = g.ok ? (await g.json()).sha : undefined;
+      const r = await fetch(url, { method: "PUT", headers: h, body: JSON.stringify({ message: "setup " + path, content, branch, sha }) });
+      if (!r.ok) throw new Error(path + " — خطا " + r.status);
+      log("✅ " + path);
+    };
+    for (const [p, t] of Object.entries(FILES)) {
+      await put(p, b64text(t.replaceAll("__NAME__", name).replaceAll("__COLOR__", color).replaceAll("__WA__", wa)));
+    }
+    const ch = [...name][0];
+    await put("icons/icon-192.png", icon(192, color, ch));
+    await put("icons/icon-512.png", icon(512, color, ch));
+    let font = null;
+    for (const u of FONTS) { try { const r = await fetch(u); if (r.ok) { font = await r.arrayBuffer(); break; } } catch (e) {} }
+    if (font) await put("fonts/Vazirmatn.woff2", b64buf(font));
+    else log("⚠️ فونت دانلود نشد؛ فعلاً فونت پیش‌فرض گوشی استفاده می‌شود.");
+    await fetch(api + "/pages", { method: "POST", headers: { ...h, "Content-Type": "application/json" }, body: JSON.stringify({ source: { branch, path: "/" } }) }).catch(() => {});
+    log("\n🎉 تمام شد! بعد از ۱ تا ۲ دقیقه این آدرس را باز کن:\nhttps://" + user + ".github.io/" + repo + "/");
+  } catch (e) { log("❌ " + e.message); }
+};
+</script>
+</body>
+</html>
